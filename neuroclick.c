@@ -73,10 +73,7 @@ int
 		// At least, this is what C89 defines. C99 allows variable declarations also in the middle of a function.
 		//char *comPortName =  (char*)malloc(sizeof(char) * (20));
 		char *comPortName = NULL;
-		//char *portNumber = NULL;
 		char *portNumber = (char*)malloc(sizeof(char) * (2 + 1));
-		//char comPortName[256] = "hello";
-		//char portNumber[256] = "hello";
 		char *comPortBase = NULL;
 		int   dllVersion = 0;
 		int   connectionId = 0;
@@ -103,7 +100,8 @@ int
 			wait();
 			exit( EXIT_FAILURE );
 		}
-
+		fprintf( stderr, "ThinkGear Connection ID is: %d.\n\n", connectionId );
+			
 		/* Set/open stream (raw bytes) log file for connection */
 		errCode = TG_SetStreamLog( connectionId, "streamLog.txt" );
 		if( errCode < 0 ) {
@@ -120,20 +118,16 @@ int
 			exit( EXIT_FAILURE );
 		}
 
-		/* Attempt to connect the connection ID handle to serial ports between COM1 and "COM16" */
+		/* Attempt to connect the connection ID handle to serial ports between COM0 and "COM16" */
+		printf("Scanning COM ports 0 to 16...\n");
 		for(i=0; i < 17 && comPortFound == 0; i++)
 		{
 
+			// Generating the serial port number
 			comPortBase = "\\\\.\\COM";
-
-			//portNumber = "1";
 			portNumber = itoa(i, portNumber, 10);
-			//comPortName = "ok";
 			fprintf( stderr, portNumber);
-			//comPortName = strcat(comPortName, portNumber);
-			//comPortBase = "\\\\.\\COM1";
 			length = strlen(comPortBase);
-			//comPortBase = (char *)realloc (comPortBase, (length + 1)*sizeof (char)); 
 			comPortName = (char *)realloc (comPortName, (length + strlen(portNumber))*sizeof (char)); 
 			strcpy(comPortName,comPortBase);
 
@@ -143,19 +137,14 @@ int
 			}
 
 			comPortName[length+strlen(portNumber)] = '\0';
-			//comPortBase = strcat(comPortBase, portNumber);
+			// Maybe I could have used something like strcat(comPortBase, portNumber);
 
 			fprintf( stdout, "ok");
-
-			//comPortName = "ok";
-			fprintf( stdout, comPortBase);
 			fprintf( stdout, comPortName);
-			//length = strlen(comPortName);
-
-			//strcmp (comPortName, ) != 0);
-
 
 			//comPortName = "\\\\.\\COM11";
+
+			// Trying to connect on the generated serial port number
 			fprintf( stdout, "trying to connect on");
 			fprintf( stdout, comPortName);
 			fprintf( stdout, "\n");
@@ -166,18 +155,16 @@ int
 			if( errCode < 0 ) {
 				fprintf( stderr, "ERROR: TG_Connect() returned %d.\n", errCode );
 
-				if(errCode == -1) printf("FAILED (Invalid connection ID)\n");
-				if(errCode == -2) printf("FAILED (0 bytes on the stream)\n");
-				if(errCode == -3) printf("FAILED (I/O error occured)\n");
-
-				//wait();
-				//exit( EXIT_FAILURE ); 
+				if(errCode == -1) printf("FAILED connection (-1 connectionId does not refer to a valid ThinkGear Connection ID handle.)\n");
+				if(errCode == -2) printf("FAILED connection (-2 serialPortName could not be opened as a serial communication port for any reason.)\n");
+				if(errCode == -3) printf("FAILED connection (-3 serialBaudrate is not a valid TG_BAUD_* value.)\n");
+				if(errCode == -4) printf("FAILED connection (-4 serialDataFormat is not a valid TG_STREAM_* type.)\n");
 			} else {
 
-				//we try to read one packet, to check the connection.
+				// Trying to read one packet to check the connection.
 				printf("Connection available...\n");
-				Sleep(10000);
-				errCode = TG_ReadPackets(connectionId,1);
+				Sleep(10000); // sometimes we need to wait a little...
+				errCode = TG_ReadPackets(connectionId, 1);
 				if(errCode >= 0)
 				{	
 
@@ -186,18 +173,18 @@ int
 				}
 				else
 				{
-					if(errCode == -1) printf("FAILED (Invalid connection ID)\n");
-					if(errCode == -2) printf("FAILED (0 bytes on the stream)\n");
-					if(errCode == -3) printf("FAILED (I/O error occured)\n");
+					if(errCode == -1) printf("FAILED reading (Invalid connection ID)\n");
+					if(errCode == -2) printf("FAILED reading (0 bytes on the stream)\n");
+					if(errCode == -3) printf("FAILED reading (I/O error occured)\n");
 				}
 
 
 			}
-		} 
+		} 	/* end: "Attempt to connect the connection ID handle to serial ports between COM0 and "COM16"" */
+		
 
-		//To get eyeblinks, you will need to first call the following function:
-		TG_EnableBlinkDetection(connectionId, 1 );
-
+		// Hopefully the connection should have been established now.
+		// Otherwise we stop here.
 		if (comPortFound == 1) {
 			printf( "connection established");
 		} else {
@@ -205,10 +192,10 @@ int
 			wait();
 			exit( EXIT_FAILURE ); 
 		}
-
-
-
-
+		
+		//To get eyeblinks, you will need to first call the following function:
+		TG_EnableBlinkDetection(connectionId, 1 );
+		
 		/* Read 10 ThinkGear Packets from the connection, 1 Packet at a time */
 		packetsRead = 0;
 		while (1){
@@ -261,7 +248,7 @@ int
 					input.mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE | MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP;
 					SendInput(1,&input,sizeof(input));
 
-				} /* end "If attention value has been updated..." */
+				} /* end "If eye blinking value has been updated..." */
 
 
 
@@ -269,12 +256,13 @@ int
 
 			// Posted by Friedemann Wolpert on July 04, 2012 @ 11:45 PM
 			// Regarding your 100% CPU Problem
+			// http://support.neurosky.com/discussions/mindwave/916-can-the-neurosky-mindwave-be-used-to-emulate-mouse-clicks-for-somebody-using-computers-all-day-long#comment_17102761
 			if( errCode == 0 ) {
 				printf( "z");
-				Sleep(200);   // maybe #include Windows.h  
+				Sleep(200);   // use #include Windows.h  
 			}
-			//
-			//  
+			
+			  
 		} /* end "Read 10 Packets of data from connection..." */
 
 		/* Clean up */
