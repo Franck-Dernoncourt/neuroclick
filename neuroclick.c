@@ -1,6 +1,10 @@
 // Description:
-// NeuroClick is a program that emulates mouse clicks with eye blinks. 
-// The source code (C) can be found below (some parts come from the example provided with the API). 
+// NeuroClick is a program that emulates mouse clicks with eye blinks 
+// why using the NeuroSky MindWave headset. http://neurosky.com/
+//
+// Main author: Franck Dernoncourt <http://francky.me>
+// NeuroClick home page: http://francky.me/software.php#Neuroclick2012
+// Version: 0.2 (20120721)
 //
 // Eye blink detection accuracy:
 // Ca. 90% accurate, due to the NeuroSky MindWave API which misses around 10% 
@@ -18,13 +22,10 @@
 // Note that <windows.h> is used to emulate mouse clicks, this code will not
 // compile on operating systems other than Windows.
 //
+//
 // Copyright (C) 2012:               
 //               - Franck Dernoncourt <http://francky.me>
 //               - Neurosky team <http://neurosky.com>
-//
-// Home Page: http://francky.me/software.php#Neuroclick2012
-// Version: 0.2 (20120721)
-//
 // This program is licensed under the Creative Commons
 // Attribution-Noncommercial-No Derivative Works 3.0 Unported license
 // <http://creativecommons.org/licenses/by-nc-nd/3.0/legalcode>
