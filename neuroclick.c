@@ -71,7 +71,6 @@ int
 		// http://andre.stechert.org/urwhatu/2006/01/error_c2143_syn.html
 		// It's no surprise that Microsoft's compiler wants the variables at the beginnig of the function: Standard C wants them there.
 		// At least, this is what C89 defines. C99 allows variable declarations also in the middle of a function.
-		//char *comPortName =  (char*)malloc(sizeof(char) * (20));
 		char *comPortName = NULL;
 		char *portNumber = (char*)malloc(sizeof(char) * (2 + 1));
 		char *comPortBase = NULL;
@@ -101,7 +100,7 @@ int
 			exit( EXIT_FAILURE );
 		}
 		fprintf( stderr, "ThinkGear Connection ID is: %d.\n\n", connectionId );
-			
+
 		/* Set/open stream (raw bytes) log file for connection */
 		errCode = TG_SetStreamLog( connectionId, "streamLog.txt" );
 		if( errCode < 0 ) {
@@ -128,6 +127,7 @@ int
 			portNumber = itoa(i, portNumber, 10);
 			fprintf( stderr, portNumber);
 			length = strlen(comPortBase);
+			comPortName = NULL; 
 			comPortName = (char *)realloc (comPortName, (length + strlen(portNumber))*sizeof (char)); 
 			strcpy(comPortName,comPortBase);
 
@@ -154,12 +154,13 @@ int
 				TG_STREAM_PACKETS );
 			if( errCode < 0 ) {
 				fprintf( stderr, "ERROR: TG_Connect() returned %d.\n", errCode );
-
 				if(errCode == -1) printf("FAILED connection (-1 connectionId does not refer to a valid ThinkGear Connection ID handle.)\n");
 				if(errCode == -2) printf("FAILED connection (-2 serialPortName could not be opened as a serial communication port for any reason.)\n");
 				if(errCode == -3) printf("FAILED connection (-3 serialBaudrate is not a valid TG_BAUD_* value.)\n");
 				if(errCode == -4) printf("FAILED connection (-4 serialDataFormat is not a valid TG_STREAM_* type.)\n");
-			} else {
+			} 
+			else
+			{
 
 				// Trying to read one packet to check the connection.
 				printf("Connection available...\n");
@@ -167,7 +168,6 @@ int
 				errCode = TG_ReadPackets(connectionId, 1);
 				if(errCode >= 0)
 				{	
-
 					printf("OK\n");
 					comPortFound = 1;
 				}
@@ -181,7 +181,7 @@ int
 
 			}
 		} 	/* end: "Attempt to connect the connection ID handle to serial ports between COM0 and "COM16"" */
-		
+
 
 		// Hopefully the connection should have been established now.
 		// Otherwise we stop here.
@@ -192,10 +192,10 @@ int
 			wait();
 			exit( EXIT_FAILURE ); 
 		}
-		
+
 		//To get eyeblinks, you will need to first call the following function:
 		TG_EnableBlinkDetection(connectionId, 1 );
-		
+
 		/* Read 10 ThinkGear Packets from the connection, 1 Packet at a time */
 		packetsRead = 0;
 		while (1){
@@ -261,8 +261,8 @@ int
 				printf( "z");
 				Sleep(200);   // use #include Windows.h  
 			}
-			
-			  
+
+
 		} /* end "Read 10 Packets of data from connection..." */
 
 		/* Clean up */
