@@ -79,6 +79,7 @@ int
 		int   packetsRead = 0;
 		int   errCode = 0;
 		int comPortFound = 0;
+		const int MAX_PORT = 16;
 		size_t length = 0;
 		int i = 0;
 		int j = 0;
@@ -117,18 +118,18 @@ int
 			exit( EXIT_FAILURE );
 		}
 
-		/* Attempt to connect the connection ID handle to serial ports between COM0 and "COM16" */
-		printf("Scanning COM ports 0 to 16...\n");
-		for(i=0; i < 17 && comPortFound == 0; i++)
+		/* Attempt to connect the connection ID handle to serial ports between COM0 and "COM MAX_PORT" */
+		fprintf(stdout, "Scanning COM ports 0 to %d...\n", MAX_PORT);
+		comPortBase = "\\\\.\\COM";
+		length = strlen(comPortBase);
+		comPortName = (char *)realloc (comPortName, (length + 5)*sizeof(char)); 
+
+		for(i=0; i <= MAX_PORT && comPortFound == 0; i++)
 		{
 
-			// Generating the serial port number
-			comPortBase = "\\\\.\\COM";
+			// Generating the serial port number			
 			portNumber = itoa(i, portNumber, 10);
 			fprintf( stderr, portNumber);
-			length = strlen(comPortBase);
-			comPortName = NULL; 
-			comPortName = (char *)realloc (comPortName, (length + strlen(portNumber))*sizeof (char)); 
 			strcpy(comPortName,comPortBase);
 
 			for(j=0; j<strlen(portNumber); j++)
